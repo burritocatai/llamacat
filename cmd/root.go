@@ -64,6 +64,10 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.llamacat.yaml)")
 
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "model", "m", "model and (optional) provider. example: ollama:mistral-8b")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "prompt", "p", "prompt to use. source followed by prompt: github/summarize or work/summarize_meeting")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "output", "o", "destination. defaults to stdout if not provided. example: workvault:ai_notes/notes")
+
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
