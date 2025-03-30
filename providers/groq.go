@@ -4,13 +4,13 @@ package providers
 import (
 	"context"
 
+	"github.com/burritocatai/llamacat/services"
 	"github.com/tmc/langchaingo/prompts"
 )
 
 // Groq is an OpenAI compatible service. Just need to register it
 func init() {
-	groqAIProvider := NewAIProvider(
-		"",
+	groqAIProvider := services.NewAIProvider(
 		"GROQ_API_KEY",
 		"gsk_",
 		"https://api.groq.com/openai/v1",
@@ -28,5 +28,5 @@ func init() {
 		return GetOpenAIModels(groqAIProvider)
 	}
 
-	RegisterAIProvider(*groqAIProvider)
+	services.RegisterAIProvider(*groqAIProvider)
 }

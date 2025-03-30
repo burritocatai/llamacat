@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/burritocatai/llamacat/services"
 	"github.com/tmc/langchaingo/llms"
 	openai_llm "github.com/tmc/langchaingo/llms/openai"
 	"github.com/tmc/langchaingo/prompts"
@@ -22,10 +23,10 @@ type OpenAIModelResponse struct {
 	} `json:"data"`
 }
 
-func GetOpenAIResponse(provider *AIProvider, model string, prompt prompts.PromptTemplate,
+func GetOpenAIResponse(provider *services.AIProvider, model string, prompt prompts.PromptTemplate,
 	content string, context context.Context) (string, error) {
 
-	apiKey, err := GetAPIKey(provider)
+	apiKey, err := services.GetAPIKey(provider)
 
 	if err != nil {
 		return content, err
@@ -51,9 +52,9 @@ func GetOpenAIResponse(provider *AIProvider, model string, prompt prompts.Prompt
 
 }
 
-func GetOpenAIModels(provider *AIProvider) ([]string, error) {
+func GetOpenAIModels(provider *services.AIProvider) ([]string, error) {
 
-	apiKey, err := GetAPIKey(provider)
+	apiKey, err := services.GetAPIKey(provider)
 	if err != nil {
 		return nil, fmt.Errorf("error getting api key: %v\n")
 	}
@@ -98,8 +99,7 @@ func GetOpenAIModels(provider *AIProvider) ([]string, error) {
 }
 
 func init() {
-	openAIProvider := NewAIProvider(
-		"",
+	openAIProvider := services.NewAIProvider(
 		"OPENAI_API_KEY",
 		"sk-",
 		"https://api.openai.com/v1",
@@ -117,5 +117,5 @@ func init() {
 		return GetOpenAIModels(openAIProvider)
 	}
 
-	RegisterAIProvider(*openAIProvider)
+	services.RegisterAIProvider(*openAIProvider)
 }

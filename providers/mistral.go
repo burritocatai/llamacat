@@ -4,12 +4,12 @@ package providers
 import (
 	"context"
 
+	"github.com/burritocatai/llamacat/services"
 	"github.com/tmc/langchaingo/prompts"
 )
 
 func init() {
-	mistralProvider := NewAIProvider(
-		"",
+	mistralProvider := services.NewAIProvider(
 		"MISTRAL_API_KEY",
 		"xx",
 		"https://api.mistral.ai/v1",
@@ -28,5 +28,5 @@ func init() {
 		return GetOpenAIModels(mistralProvider)
 	}
 
-	RegisterAIProvider(*mistralProvider)
+	services.RegisterAIProvider(*mistralProvider)
 }
