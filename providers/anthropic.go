@@ -66,7 +66,7 @@ func GetAnthropicModels(provider *services.AIProvider) ([]string, error) {
 
 	req, err := http.NewRequest("GET", modelRequestURL, nil)
 	if err != nil {
-		return nil, fmt.Errorf("Error creating request: %v\n")
+		return nil, fmt.Errorf("error creating request: %v\n", err)
 	}
 
 	req.Header.Add("x-api-key", apiKey)

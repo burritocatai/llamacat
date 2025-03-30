@@ -56,14 +56,14 @@ func GetOpenAIModels(provider *services.AIProvider) ([]string, error) {
 
 	apiKey, err := services.GetAPIKey(provider)
 	if err != nil {
-		return nil, fmt.Errorf("error getting api key: %v\n")
+		return nil, fmt.Errorf("error getting api key: %v\n", err)
 	}
 
 	var modelRequestURL = provider.APIBaseURL + "/" + provider.APIModelEndpoint
 
 	req, err := http.NewRequest("GET", modelRequestURL, nil)
 	if err != nil {
-		return nil, fmt.Errorf("Error creating request: %v\n")
+		return nil, fmt.Errorf("error creating request: %v\n", err)
 	}
 
 	req.Header.Add("Authorization", "Bearer "+apiKey)
@@ -72,7 +72,7 @@ func GetOpenAIModels(provider *services.AIProvider) ([]string, error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("Error making request: %v\n", err)
+		return nil, fmt.Errorf("error making request: %v\n", err)
 	}
 	defer resp.Body.Close()
 
