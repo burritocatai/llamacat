@@ -1,0 +1,37 @@
+
+{
+	"name": "Go",
+	"build": {
+        "dockerfile": "./Dockerfile",
+        "context": "."
+    },
+	"features": {
+		"ghcr.io/devcontainers/features/common-utils:2": {
+            "installZsh": "true",
+            "username": "vscode",
+            "userUid": "1000",
+            "userGid": "1000",
+            "upgradePackages": "true"
+        },
+		"ghcr.io/devcontainers/features/git:1": {
+            "version": "latest",
+            "ppa": "false"
+        },
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {
+
+		}
+	},
+	"customizations": {
+		// Configure properties specific to VS Code.
+		"vscode": {
+			"extensions": [
+					"golang.go",
+					"roemer.gotaskr-vscode",
+					"GitHub.vscode-github-actions"
+				]
+		}
+	},
+	"remoteUser": "vscode",
+	"postStartCommand": "go install github.com/stefanlogue/meteor@latest && go install github.com/spf13/cobra-cli@latest"
+	
+}
