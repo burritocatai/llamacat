@@ -81,3 +81,53 @@ func TestNewAIProvider(t *testing.T) {
 		})
 	}
 }
+
+func TestGetProviderAndModel(t *testing.T) {
+
+	RegisterAIProvider(*CreateTestProvider())
+
+	t.Run("existing provider and model", func(t *testing.T) {
+		testModelFlag := "openai:gpt-4o-mini"
+		expectedProviderId := "openai"
+		expectedModel := "gpt-4o-mini"
+		provider, modelName, err := GetProviderAndModel(testModelFlag)
+		if provider.Id != expectedProviderId {
+			t.Errorf("expected '%s' but got '%s'", expectedProviderId, provider.Id)
+		}
+		if modelName != expectedModel {
+			t.Errorf("expected '%s' but got '%s'", expectedModel, modelName)
+		}
+		if err != nil {
+			t.Errorf("expected no error but got %v", err)
+		}
+	})
+
+	t.Run("non-extant provider and model", func(t *testing.T) {
+		testModelFlag := "catai:nine-lives-large"
+		expectedProviderId := ""
+		expectedModel := "nine-lives-large"
+		provider, modelName, err := GetProviderAndModel(testModelFlag)
+		if provider.Id != expectedProviderId {
+			t.Errorf("expected '%s' but got '%s'", expectedProviderId, provider.Id)
+		}
+		if modelName != expectedModel {
+			t.Errorf("expected '%s' but got '%s'", expectedModel, modelName)
+		}
+		if err == nil {
+			t.Errorf("expected an error but got %v", err)
+		}
+	})
+
+}
+
+// func TestGetSupportedModels(t *testing.T) {
+// 	openAIModels := []string{
+// 		"gpt-4o-mini",
+// 		"o1",
+// 		"o3-mini",
+// 	}
+// 	openAIProvider := CreateTestProvider()
+
+// 	GetSupportedModels(provider)
+
+// }
