@@ -23,7 +23,9 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -39,7 +41,15 @@ var rootCmd = &cobra.Command{
 customizable prompts, and robust output options to places such as Obsidian and n8n.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	Run: func(cmd *cobra.Command, args []string) {
+		content, err := getContent(args)
+		if err != nil {
+			os.Exit(1)
+		}
+
+		fmt.Printf("this was the content %s", content)
+
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -59,6 +69,7 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.llamacat.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "content", "c", "content to use")
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "model", "m", "model and (optional) provider. example: ollama:mistral-8b")
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "prompt", "p", "prompt to use. source followed by prompt: github/summarize or work/summarize_meeting")
@@ -91,4 +102,29 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
 	}
+}
+
+// Content can be piped in or passed via --content or -c
+func getContent(args []string) (string, error) {
+	// Check if input is piped
+	stat, _ := os.Stdin.Stat()
+	isPiped := (stat.Mode() & os.ModeCharDevice) == 0
+
+	var content string
+
+	if isPiped {
+		// Read from stdin (for pipe)
+		bytes, err := io.ReadAll(os.Stdin)
+		if err != nil {
+			return "", fmt.Errorf("error reading from stdin: %v", err)
+		}
+		content = string(bytes)
+	} else if len(args) > 0 {
+		// Read from arguments
+		content = strings.Join(args, " ")
+	} else {
+		return "", fmt.Errorf("no content provided")
+	}
+
+	return content, nil
 }
