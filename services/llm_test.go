@@ -149,15 +149,3 @@ func TestGetProviderAndModel(t *testing.T) {
 	})
 
 }
-
-// func TestGetSupportedModels(t *testing.T) {
-// 	openAIModels := []string{
-// 		"gpt-4o-mini",
-// 		"o1",
-// 		"o3-mini",
-// 	}
-// 	openAIProvider := CreateTestProvider()
-
-// 	GetSupportedModels(provider)
-
-// }
