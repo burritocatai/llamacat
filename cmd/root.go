@@ -81,7 +81,13 @@ customizable prompts, and robust output options to places such as Obsidian and n
 		}
 		fmt.Printf("%s", response)
 
-		// TODO: take output from that and send to output
+		// take output from that and send to output
+		sendOutput, path, target, err := services.GetOutputFunc(output)
+		if err != nil {
+			fmt.Printf("error received %s", err.Error())
+			os.Exit(1)
+		}
+		sendOutput(response, path, target)
 
 	},
 }
