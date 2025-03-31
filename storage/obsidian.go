@@ -2,6 +2,7 @@ package storage
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -17,9 +18,11 @@ type VaultInfo struct {
 	Path string
 }
 
-func WriteToObsidian(content, vaultpath, targetpath string) {
+func WriteToObsidian(content, vaultAlias, targetPath string) {
 	// TODO:
-
+	fmt.Println("this is where I would write to obsidian...")
+	// TODO: GetVaultPathFromAlias
+	// WriteToLocalStorage(content, vaultpath, targetpath)
 }
 
 func GetObsidianVaults() []VaultInfo {

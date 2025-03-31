@@ -87,18 +87,15 @@ func GetOutputFunc(output string) (outputFunc func(content string, path string, 
 		if cfg["alias"] != alias {
 			continue
 		}
-
-		fmt.Printf("target of %s\n", target) // Print target once, as it applies to the chosen output
-
 		switch cfg["destination"] {
 		case "obsidian":
-			fmt.Println("obsidian output chosen")
 			return func(content, path, target string) {
 				storage.WriteToObsidian(content, path, target)
 			}, alias, target, nil
 		case "local":
-			fmt.Println("local file output chosen")
-			return nil, "", "", nil
+			return func(content, path, target string) {
+				storage.WriteToLocalStorage(content, path, target)
+			}, alias, target, nil
 		default:
 			return nil, "", "", nil
 		}
