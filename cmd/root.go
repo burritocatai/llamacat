@@ -27,11 +27,19 @@ import (
 	"os"
 	"strings"
 
+	"github.com/burritocatai/llamacat/providers"
+	"github.com/burritocatai/llamacat/providers/groq"
+	"github.com/burritocatai/llamacat/providers/openai"
+	"github.com/burritocatai/llamacat/services"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var cfgFile string
+var model string
+var prompt string
+var content string
+var output string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -47,10 +55,31 @@ customizable prompts, and robust output options to places such as Obsidian and n
 			os.Exit(1)
 		}
 
-		fmt.Printf("this was the content %s", content)
+		if model == "" {
+			model = "fakeai:fake-model-9"
+		}
+
+		if prompt == "" {
+			prompt = "fake:prompt"
+		}
+
+		// add supported providers
+		groqProvider := groq.CreateGroqProvider()
+		openaiProvider := openai.CreateOpenAIProvider()
+
+		providers.RegisterAIProvider(groqProvider)
+		providers.RegisterAIProvider(openaiProvider)
+
 		// check content for type, url or text
 		// if type is url, call url llm. if text call text llm.
+		response, err := services.ProcessLLMRequest(content, model, prompt)
 		// take output from that and send to output
+
+		if err != nil {
+			fmt.Printf("error received %s", err.Error())
+			os.Exit(1)
+		}
+		fmt.Printf("this was the response %s", response)
 
 	},
 }
@@ -72,11 +101,11 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.llamacat.yaml)")
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "content", "c", "content to use")
+	rootCmd.PersistentFlags().StringVarP(&content, "content", "c", "", "content to use")
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "model", "m", "model and (optional) provider. example: ollama:mistral-8b")
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "prompt", "p", "prompt to use. source followed by prompt: github/summarize or work/summarize_meeting")
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "output", "o", "destination. defaults to stdout if not provided. example: workvault:ai_notes/notes")
+	rootCmd.PersistentFlags().StringVarP(&model, "model", "m", "", "provider and model. separated by :. example: ollama:mistral-8b")
+	rootCmd.PersistentFlags().StringVarP(&prompt, "prompt", "p", "", "prompt to use. source followed by prompt: github/summarize or work/summarize_meeting")
+	rootCmd.PersistentFlags().StringVar(&output, "output", "", "destination. defaults to stdout if not provided. example: workvault:ai_notes/notes")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.

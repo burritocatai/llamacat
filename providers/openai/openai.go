@@ -121,6 +121,6 @@ func GetOpenAIModels(provider *providers.AIProvider) ([]string, error) {
 	return modelList, nil
 }
 
-func init() {
-	providers.RegisterAIProvider(CreateOpenAIProvider())
-}
+// func init() {
+// 	providers.RegisterAIProvider(CreateOpenAIProvider())
+// }

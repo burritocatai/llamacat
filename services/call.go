@@ -3,6 +3,7 @@ package services
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/burritocatai/llamacat/providers"
 	"github.com/tmc/langchaingo/prompts"
@@ -18,6 +19,8 @@ func ProcessLLMRequest(content, model, prompt string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	fmt.Printf("calling %s", selectedProvider.Id)
 
 	response, err := CallLLM(selectedProvider, selectedModel, content, selectedPrompt)
 

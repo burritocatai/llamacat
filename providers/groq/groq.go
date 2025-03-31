@@ -91,6 +91,6 @@ func CreateGroqProvider() providers.AIProvider {
 }
 
 // Groq is an OpenAI compatible service. Just need to register it
-func init() {
-	providers.RegisterAIProvider(CreateGroqProvider())
-}
+// func init() {
+// 	providers.RegisterAIProvider(CreateGroqProvider())
+// }
