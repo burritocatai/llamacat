@@ -84,21 +84,23 @@ func GetOutputFunc(output string) (outputFunc func(content string, path string, 
 
 	for _, config := range configuredOutputs {
 		cfg := config.(map[string]interface{})
-		if cfg["alias"] == alias {
-			switch cfg["destination"] {
-			case "obsidian":
-				fmt.Println("obsidian output chosen")
-				fmt.Printf("target of %s", target)
-				return func(content, path, target string) {
-					storage.WriteToObsidian(content, path, target)
-				}, alias, target, nil
-			case "local":
-				fmt.Println("local file output chosen")
-				fmt.Printf("target of %s", target)
-				return nil, "", "", nil
-			default:
-				return nil, "", "", nil
-			}
+		if cfg["alias"] != alias {
+			continue
+		}
+
+		fmt.Printf("target of %s\n", target) // Print target once, as it applies to the chosen output
+
+		switch cfg["destination"] {
+		case "obsidian":
+			fmt.Println("obsidian output chosen")
+			return func(content, path, target string) {
+				storage.WriteToObsidian(content, path, target)
+			}, alias, target, nil
+		case "local":
+			fmt.Println("local file output chosen")
+			return nil, "", "", nil
+		default:
+			return nil, "", "", nil
 		}
 	}
 
