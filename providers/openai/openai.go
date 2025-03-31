@@ -1,5 +1,5 @@
 // internal/providers/openai/openai.go
-package providers
+package openai
 
 import (
 	"context"

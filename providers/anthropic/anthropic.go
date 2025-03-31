@@ -1,5 +1,5 @@
-// internal/providers/anthropic.go
-package providers
+// internal/providers/anthropic/anthropic.go
+package anthropic
 
 import (
 	"context"
