@@ -4,6 +4,7 @@ package services
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/burritocatai/llamacat/providers"
@@ -52,7 +53,7 @@ func GetProviderAndModel(model string) (providers.AIProvider, string, error) {
 
 }
 
-func GetPrompt(prompt string) (prompts.PromptTemplate, error) {
+func GetPromptConfig(prompt string) (prompts.PromptTemplate, error) {
 	parts := strings.Split(prompt, ":")
 
 	if len(parts) != 2 {
@@ -67,7 +68,7 @@ func GetPrompt(prompt string) (prompts.PromptTemplate, error) {
 
 }
 
-func GetOutputFunc(output string) (outputFunc func(content string, path string, target string), path string, target string, err error) {
+func GetOutputConfig(output string) (outputFunc func(content string, path string, target string), path string, target string, err error) {
 	parts := strings.Split(output, ":")
 
 	if len(parts) != 2 {
@@ -91,11 +92,11 @@ func GetOutputFunc(output string) (outputFunc func(content string, path string, 
 		case "obsidian":
 			return func(content, path, target string) {
 				storage.WriteToObsidian(content, path, target)
-			}, alias, target, nil
+			}, cfg["path"].(string), filepath.Join(target, cfg["file_name"].(string)), nil
 		case "local":
 			return func(content, path, target string) {
 				storage.WriteToLocalStorage(content, path, target)
-			}, alias, target, nil
+			}, cfg["path"].(string), filepath.Join(target, cfg["file_name"].(string)), nil
 		default:
 			return nil, "", "", nil
 		}

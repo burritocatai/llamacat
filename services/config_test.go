@@ -49,7 +49,7 @@ func TestGetPrompt(t *testing.T) {
 	inputPrompt := "fake:prompt"
 	expectedPrompt := prompts.NewPromptTemplate("You are a helpful assistant. Help the user with their content.\n\nCONTENT: {{.content}}", []string{"content"})
 
-	receivedPrompt, err := GetPrompt(inputPrompt)
+	receivedPrompt, err := GetPromptConfig(inputPrompt)
 	if err != nil {
 		t.Errorf("did not expect error. received %v", err)
 	}
@@ -74,7 +74,7 @@ func TestGetOutputFunc(t *testing.T) {
 	outputParam := "work:Notes/fromllamacat"
 	setupViper(t)
 
-	outputFunc, path, target, err := GetOutputFunc(outputParam)
+	outputFunc, path, target, err := GetOutputConfig(outputParam)
 	if err != nil {
 		t.Errorf("did not expect an error. received %v", err)
 	}

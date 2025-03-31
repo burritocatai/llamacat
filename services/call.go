@@ -14,7 +14,7 @@ func ProcessLLMRequest(content, model, prompt string) (string, error) {
 		return "", err
 	}
 
-	selectedPrompt, err := GetPrompt(prompt)
+	selectedPrompt, err := GetPromptConfig(prompt)
 	if err != nil {
 		return "", err
 	}

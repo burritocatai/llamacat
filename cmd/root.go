@@ -82,7 +82,7 @@ customizable prompts, and robust output options to places such as Obsidian and n
 		fmt.Printf("%s", response)
 
 		// take output from that and send to output
-		sendOutput, path, target, err := services.GetOutputFunc(output)
+		sendOutput, path, target, err := services.GetOutputConfig(output)
 		if err != nil {
 			fmt.Printf("error received %s", err.Error())
 			os.Exit(1)
