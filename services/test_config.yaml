@@ -1,0 +1,6 @@
+---
+
+outputs:
+  - alias: work
+    destination: obsidian
+    path: /home/vscode/workvault

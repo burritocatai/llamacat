@@ -7,6 +7,7 @@ import (
 
 	"github.com/burritocatai/llamacat/providers"
 	"github.com/burritocatai/llamacat/providers/fake"
+	"github.com/spf13/viper"
 	"github.com/tmc/langchaingo/prompts"
 )
 
@@ -67,4 +68,30 @@ func TestGetPrompt(t *testing.T) {
 		t.Errorf("did not expect error. received %v", err)
 	}
 
+}
+
+func TestGetOutputFunc(t *testing.T) {
+	outputParam := "work:Notes/fromllamacat"
+	setupViper(t)
+
+	outputFunc, path, target, err := GetOutputFunc(outputParam)
+	if err != nil {
+		t.Errorf("did not expect an error. received %v", err)
+	}
+	if outputFunc == nil {
+		t.Errorf("did not expect a nil output fun. received nil")
+	} else {
+		//
+		outputFunc("test", path, target)
+	}
+}
+
+func setupViper(t *testing.T) {
+	viper.SetConfigName("test_config")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(".") // Look for config in the current directory
+	err := viper.ReadInConfig()
+	if err != nil {
+		t.Fatalf("Error reading config file: %v", err)
+	}
 }

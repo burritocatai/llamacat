@@ -8,6 +8,8 @@ import (
 
 	"github.com/burritocatai/llamacat/providers"
 	"github.com/burritocatai/llamacat/providers/fake"
+	"github.com/burritocatai/llamacat/storage"
+	"github.com/spf13/viper"
 	"github.com/tmc/langchaingo/prompts"
 )
 
@@ -62,5 +64,44 @@ func GetPrompt(prompt string) (prompts.PromptTemplate, error) {
 	return prompts.NewPromptTemplate(
 			"You are a helpful assistant. Help the user with their content.\n\nCONTENT: {{.content}}", []string{"content"}),
 		nil
+
+}
+
+func GetOutputFunc(output string) (outputFunc func(content string, path string, target string), path string, target string, err error) {
+	parts := strings.Split(output, ":")
+
+	if len(parts) != 2 {
+		return nil, "", "", fmt.Errorf("invalid output parameter, received %s", output)
+	}
+
+	alias := parts[0]
+	target = parts[1]
+
+	if !viper.InConfig("outputs") {
+		return nil, "", "", fmt.Errorf("no outputs configured")
+	}
+	configuredOutputs := viper.Get("outputs").([]interface{})
+
+	for _, config := range configuredOutputs {
+		cfg := config.(map[string]interface{})
+		if cfg["alias"] == alias {
+			switch cfg["destination"] {
+			case "obsidian":
+				fmt.Println("obsidian output chosen")
+				fmt.Printf("target of %s", target)
+				return func(content, path, target string) {
+					storage.WriteToObsidian(content, path, target)
+				}, alias, target, nil
+			case "local":
+				fmt.Println("local file output chosen")
+				fmt.Printf("target of %s", target)
+				return nil, "", "", nil
+			default:
+				return nil, "", "", nil
+			}
+		}
+	}
+
+	return nil, "", "", fmt.Errorf("could not find output with alias %s", alias)
 
 }
