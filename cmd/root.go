@@ -63,23 +63,25 @@ customizable prompts, and robust output options to places such as Obsidian and n
 			prompt = "fake:prompt"
 		}
 
-		// add supported providers
+		// add supported providers, TODO: move this to config
 		groqProvider := groq.CreateGroqProvider()
 		openaiProvider := openai.CreateOpenAIProvider()
 
 		providers.RegisterAIProvider(groqProvider)
 		providers.RegisterAIProvider(openaiProvider)
 
-		// check content for type, url or text
-		// if type is url, call url llm. if text call text llm.
-		response, err := services.ProcessLLMRequest(content, model, prompt)
-		// take output from that and send to output
+		// TODO: check content for type, url or text
+		// TODO: if type is url, call url llm. if text call text llm.
 
+		// Call LLM
+		response, err := services.ProcessLLMRequest(content, model, prompt)
 		if err != nil {
 			fmt.Printf("error received %s", err.Error())
 			os.Exit(1)
 		}
-		fmt.Printf("this was the response %s", response)
+		fmt.Printf("%s", response)
+
+		// TODO: take output from that and send to output
 
 	},
 }
