@@ -48,6 +48,9 @@ customizable prompts, and robust output options to places such as Obsidian and n
 		}
 
 		fmt.Printf("this was the content %s", content)
+		// check content for type, url or text
+		// if type is url, call url llm. if text call text llm.
+		// take output from that and send to output
 
 	},
 }
