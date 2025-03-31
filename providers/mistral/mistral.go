@@ -1,15 +1,16 @@
-// internal/providers/mistral.go
-package providers
+// internal/providers/mistral/mistral.go
+package mistral
 
 import (
 	"context"
 
-	"github.com/burritocatai/llamacat/services"
+	"github.com/burritocatai/llamacat/providers"
+	"github.com/burritocatai/llamacat/providers/openai"
 	"github.com/tmc/langchaingo/prompts"
 )
 
 func init() {
-	mistralProvider := services.NewAIProvider(
+	mistralProvider := providers.NewAIProvider(
 		"MISTRAL_API_KEY",
 		"xx",
 		"https://api.mistral.ai/v1",
@@ -20,13 +21,13 @@ func init() {
 	)
 	mistralProvider.Call = func(model string, prompt prompts.PromptTemplate,
 		content string, context context.Context) (string, error) {
-		return GetOpenAIResponse(mistralProvider, model, prompt, content, context)
+		return openai.GetOpenAIResponse(mistralProvider, model, prompt, content, context)
 	}
 
 	// mistral API is similar enough to use the OpenAI model pull
 	mistralProvider.GetModels = func() ([]string, error) {
-		return GetOpenAIModels(mistralProvider)
+		return openai.GetOpenAIModels(mistralProvider)
 	}
 
-	services.RegisterAIProvider(*mistralProvider)
+	providers.RegisterAIProvider(*mistralProvider)
 }

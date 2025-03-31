@@ -1,8 +1,20 @@
-package services
+package providers
 
 import (
 	"testing"
 )
+
+func CreateTestProvider() *AIProvider {
+	return NewAIProvider(
+		"OPENAI_API_KEY",
+		"sk-",
+		"https://api.openai.com/v1",
+		"models",
+		"OpenAI",
+		"openai",
+		"https://platform.openai.com",
+	)
+}
 
 func TestNewAIProvider(t *testing.T) {
 	// Setup test data
@@ -80,4 +92,60 @@ func TestNewAIProvider(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestRegisterAIProvider(t *testing.T) {
+	testProvider := CreateTestProvider()
+
+	RegisterAIProvider(*testProvider)
+
+	containsProvider := false
+	for _, provider := range AIProviders {
+		if provider.Id == testProvider.Id {
+			containsProvider = true
+		}
+	}
+
+	if !containsProvider {
+		t.Errorf("expected %s to exist in AIProviders. does not", testProvider.Id)
+	}
+
+}
+
+func TestGetProviderAndModel(t *testing.T) {
+
+	RegisterAIProvider(*CreateTestProvider())
+
+	t.Run("existing provider and model", func(t *testing.T) {
+		testModelFlag := "openai:gpt-4o-mini"
+		expectedProviderId := "openai"
+		expectedModel := "gpt-4o-mini"
+		provider, modelName, err := GetProviderAndModel(testModelFlag)
+		if provider.Id != expectedProviderId {
+			t.Errorf("expected '%s' but got '%s'", expectedProviderId, provider.Id)
+		}
+		if modelName != expectedModel {
+			t.Errorf("expected '%s' but got '%s'", expectedModel, modelName)
+		}
+		if err != nil {
+			t.Errorf("expected no error but got %v", err)
+		}
+	})
+
+	t.Run("non-extant provider and model", func(t *testing.T) {
+		testModelFlag := "catai:nine-lives-large"
+		expectedProviderId := ""
+		expectedModel := "nine-lives-large"
+		provider, modelName, err := GetProviderAndModel(testModelFlag)
+		if provider.Id != expectedProviderId {
+			t.Errorf("expected '%s' but got '%s'", expectedProviderId, provider.Id)
+		}
+		if modelName != expectedModel {
+			t.Errorf("expected '%s' but got '%s'", expectedModel, modelName)
+		}
+		if err == nil {
+			t.Errorf("expected an error but got %v", err)
+		}
+	})
+
 }

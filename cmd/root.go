@@ -23,13 +23,23 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"os"
+	"strings"
 
+	"github.com/burritocatai/llamacat/providers"
+	"github.com/burritocatai/llamacat/providers/groq"
+	"github.com/burritocatai/llamacat/providers/openai"
+	"github.com/burritocatai/llamacat/services"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
 var cfgFile string
+var model string
+var prompt string
+var content string
+var output string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -39,7 +49,41 @@ var rootCmd = &cobra.Command{
 customizable prompts, and robust output options to places such as Obsidian and n8n.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	Run: func(cmd *cobra.Command, args []string) {
+		content, err := getContent(args)
+		if err != nil {
+			os.Exit(1)
+		}
+
+		if model == "" {
+			model = "fakeai:fake-model-9"
+		}
+
+		if prompt == "" {
+			prompt = "fake:prompt"
+		}
+
+		// add supported providers, TODO: move this to config
+		groqProvider := groq.CreateGroqProvider()
+		openaiProvider := openai.CreateOpenAIProvider()
+
+		providers.RegisterAIProvider(groqProvider)
+		providers.RegisterAIProvider(openaiProvider)
+
+		// TODO: check content for type, url or text
+		// TODO: if type is url, call url llm. if text call text llm.
+
+		// Call LLM
+		response, err := services.ProcessLLMRequest(content, model, prompt)
+		if err != nil {
+			fmt.Printf("error received %s", err.Error())
+			os.Exit(1)
+		}
+		fmt.Printf("%s", response)
+
+		// TODO: take output from that and send to output
+
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -59,10 +103,11 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.llamacat.yaml)")
+	rootCmd.PersistentFlags().StringVarP(&content, "content", "c", "", "content to use")
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "model", "m", "model and (optional) provider. example: ollama:mistral-8b")
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "prompt", "p", "prompt to use. source followed by prompt: github/summarize or work/summarize_meeting")
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "output", "o", "destination. defaults to stdout if not provided. example: workvault:ai_notes/notes")
+	rootCmd.PersistentFlags().StringVarP(&model, "model", "m", "", "provider and model. separated by :. example: ollama:mistral-8b")
+	rootCmd.PersistentFlags().StringVarP(&prompt, "prompt", "p", "", "prompt to use. source followed by prompt: github/summarize or work/summarize_meeting")
+	rootCmd.PersistentFlags().StringVar(&output, "output", "", "destination. defaults to stdout if not provided. example: workvault:ai_notes/notes")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
@@ -91,4 +136,29 @@ func initConfig() {
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
 	}
+}
+
+// Content can be piped in or passed via --content or -c
+func getContent(args []string) (string, error) {
+	// Check if input is piped
+	stat, _ := os.Stdin.Stat()
+	isPiped := (stat.Mode() & os.ModeCharDevice) == 0
+
+	var content string
+
+	if isPiped {
+		// Read from stdin (for pipe)
+		bytes, err := io.ReadAll(os.Stdin)
+		if err != nil {
+			return "", fmt.Errorf("error reading from stdin: %v", err)
+		}
+		content = string(bytes)
+	} else if len(args) > 0 {
+		// Read from arguments
+		content = strings.Join(args, " ")
+	} else {
+		return "", fmt.Errorf("no content provided")
+	}
+
+	return content, nil
 }

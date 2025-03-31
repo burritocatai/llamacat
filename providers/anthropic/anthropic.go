@@ -1,5 +1,5 @@
-// internal/providers/openai.go
-package providers
+// internal/providers/anthropic/anthropic.go
+package anthropic
 
 import (
 	"context"
@@ -8,22 +8,26 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/burritocatai/llamacat/providers"
 	"github.com/burritocatai/llamacat/services"
 	"github.com/tmc/langchaingo/llms"
-	openai_llm "github.com/tmc/langchaingo/llms/openai"
+	anthropic_llm "github.com/tmc/langchaingo/llms/anthropic"
 	"github.com/tmc/langchaingo/prompts"
 )
 
-type OpenAIModelResponse struct {
+type AnthropicModelResponse struct {
 	Data []struct {
-		Object    string `json:"object"`
-		ID        string `json:"id"`
-		OwnedBy   string `json:"owned_by"`
-		CreatedAt int32  `json:"created"`
+		Type        string `json:"type"`
+		ID          string `json:"id"`
+		DisplayName string `json:"display_name"`
+		CreatedAt   string `json:"created_at"`
 	} `json:"data"`
+	HasMore bool   `json:"has_more"`
+	FirstID string `json:"first_id"`
+	LastID  string `json:"last_id"`
 }
 
-func GetOpenAIResponse(provider *services.AIProvider, model string, prompt prompts.PromptTemplate,
+func GetAnthropicResponse(provider *providers.AIProvider, model string, prompt prompts.PromptTemplate,
 	content string, context context.Context) (string, error) {
 
 	apiKey, err := services.GetAPIKey(provider)
@@ -32,10 +36,10 @@ func GetOpenAIResponse(provider *services.AIProvider, model string, prompt promp
 		return content, err
 	}
 
-	llm, err := openai_llm.New(
-		openai_llm.WithModel(model),
-		openai_llm.WithBaseURL(provider.APIBaseURL),
-		openai_llm.WithToken(apiKey),
+	llm, err := anthropic_llm.New(
+		anthropic_llm.WithModel(model),
+		anthropic_llm.WithBaseURL(provider.APIBaseURL),
+		anthropic_llm.WithToken(apiKey),
 	)
 	if err != nil {
 		return content, err
@@ -52,11 +56,11 @@ func GetOpenAIResponse(provider *services.AIProvider, model string, prompt promp
 
 }
 
-func GetOpenAIModels(provider *services.AIProvider) ([]string, error) {
+func GetAnthropicModels(provider *providers.AIProvider) ([]string, error) {
 
 	apiKey, err := services.GetAPIKey(provider)
 	if err != nil {
-		return nil, fmt.Errorf("error getting api key: %v\n", err)
+		return nil, fmt.Errorf(err.Error())
 	}
 
 	var modelRequestURL = provider.APIBaseURL + "/" + provider.APIModelEndpoint
@@ -66,13 +70,14 @@ func GetOpenAIModels(provider *services.AIProvider) ([]string, error) {
 		return nil, fmt.Errorf("error creating request: %v\n", err)
 	}
 
-	req.Header.Add("Authorization", "Bearer "+apiKey)
+	req.Header.Add("x-api-key", apiKey)
+	req.Header.Add("anthropic-version", "2023-06-01")
 
 	// Make the request
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("error making request: %v\n", err)
+		return nil, fmt.Errorf("Error making request: %v\n", err)
 	}
 	defer resp.Body.Close()
 
@@ -83,7 +88,7 @@ func GetOpenAIModels(provider *services.AIProvider) ([]string, error) {
 	}
 
 	// Parse the JSON response
-	var modelResp OpenAIModelResponse
+	var modelResp AnthropicModelResponse
 	err = json.Unmarshal(body, &modelResp)
 	if err != nil {
 		return nil, fmt.Errorf("Error parsing JSON: %v\n", err)
@@ -99,23 +104,23 @@ func GetOpenAIModels(provider *services.AIProvider) ([]string, error) {
 }
 
 func init() {
-	openAIProvider := services.NewAIProvider(
-		"OPENAI_API_KEY",
+	anthropicProvider := providers.NewAIProvider(
+		"ANTHROPIC_API_KEY",
 		"sk-",
-		"https://api.openai.com/v1",
+		"https://api.anthropic.com/v1",
 		"models",
-		"OpenAI",
-		"openai",
-		"https://platform.openai.com",
+		"Anthropic",
+		"anthropic",
+		"https://anthropic.com",
 	)
-	openAIProvider.Call = func(model string, prompt prompts.PromptTemplate,
+	anthropicProvider.Call = func(model string, prompt prompts.PromptTemplate,
 		content string, context context.Context) (string, error) {
-		return GetOpenAIResponse(openAIProvider, model, prompt, content, context)
+		return GetAnthropicResponse(anthropicProvider, model, prompt, content, context)
 	}
 
-	openAIProvider.GetModels = func() ([]string, error) {
-		return GetOpenAIModels(openAIProvider)
+	anthropicProvider.GetModels = func() ([]string, error) {
+		return GetAnthropicModels(anthropicProvider)
 	}
 
-	services.RegisterAIProvider(*openAIProvider)
+	providers.RegisterAIProvider(*anthropicProvider)
 }
