@@ -8,8 +8,7 @@ import (
 )
 
 func WriteToLocalStorage(content, rootPath, targetPath string) {
-	// TODO: finish this up
-	fmt.Println("this is where I would write to local storage...")
+	targetPath = ReplaceStringWithDate(targetPath)
 	path := path.Join(rootPath, targetPath)
 	appendToFile(path, content)
 }
