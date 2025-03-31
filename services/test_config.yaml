@@ -4,3 +4,4 @@ outputs:
   - alias: work
     destination: obsidian
     path: /home/vscode/workvault
+    file_name: llamacat-yyyy-MM-dd.md
