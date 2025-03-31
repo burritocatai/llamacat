@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/burritocatai/llamacat/providers"
 	"github.com/burritocatai/llamacat/services"
 	"github.com/tmc/langchaingo/llms"
 	openai_llm "github.com/tmc/langchaingo/llms/openai"
@@ -57,8 +58,8 @@ var OpenAIModelList = OpenAIModels{
 	},
 }
 
-func CreateOpenAIProvider() services.AIProvider {
-	openAIProvider := services.NewAIProvider(
+func CreateOpenAIProvider() providers.AIProvider {
+	openAIProvider := providers.NewAIProvider(
 		"OPENAI_API_KEY",
 		"sk-",
 		"https://api.openai.com/v1",
@@ -79,7 +80,7 @@ func CreateOpenAIProvider() services.AIProvider {
 	return *openAIProvider
 }
 
-func GetOpenAIResponse(provider *services.AIProvider, model string, prompt prompts.PromptTemplate,
+func GetOpenAIResponse(provider *providers.AIProvider, model string, prompt prompts.PromptTemplate,
 	content string, context context.Context) (string, error) {
 
 	apiKey, err := services.GetAPIKey(provider)
@@ -108,7 +109,7 @@ func GetOpenAIResponse(provider *services.AIProvider, model string, prompt promp
 
 }
 
-func GetOpenAIModels(provider *services.AIProvider) ([]string, error) {
+func GetOpenAIModels(provider *providers.AIProvider) ([]string, error) {
 	modelList := make([]string, 0)
 	for _, model := range OpenAIModelList.Models {
 		modelList = append(modelList, model.ID)
@@ -121,5 +122,5 @@ func GetOpenAIModels(provider *services.AIProvider) ([]string, error) {
 }
 
 func init() {
-	services.RegisterAIProvider(CreateOpenAIProvider())
+	providers.RegisterAIProvider(CreateOpenAIProvider())
 }

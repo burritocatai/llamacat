@@ -4,13 +4,15 @@ package services
 import (
 	"os"
 	"testing"
+
+	"github.com/burritocatai/llamacat/providers"
 )
 
 func TestGetAPIKey(t *testing.T) {
 	testAPIKey := "catsAreAPIs"
 	os.Setenv("TEST_API_KEY", testAPIKey)
 
-	testProvider := NewAIProvider("TEST_API_KEY", "", "", "", "", "", "")
+	testProvider := providers.NewAIProvider("TEST_API_KEY", "", "", "", "", "", "")
 	apikey, err := GetAPIKey(testProvider)
 	expected := testAPIKey
 

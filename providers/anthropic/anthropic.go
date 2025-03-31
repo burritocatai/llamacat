@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/burritocatai/llamacat/providers"
 	"github.com/burritocatai/llamacat/services"
 	"github.com/tmc/langchaingo/llms"
 	anthropic_llm "github.com/tmc/langchaingo/llms/anthropic"
@@ -26,7 +27,7 @@ type AnthropicModelResponse struct {
 	LastID  string `json:"last_id"`
 }
 
-func GetAnthropicResponse(provider *services.AIProvider, model string, prompt prompts.PromptTemplate,
+func GetAnthropicResponse(provider *providers.AIProvider, model string, prompt prompts.PromptTemplate,
 	content string, context context.Context) (string, error) {
 
 	apiKey, err := services.GetAPIKey(provider)
@@ -55,7 +56,7 @@ func GetAnthropicResponse(provider *services.AIProvider, model string, prompt pr
 
 }
 
-func GetAnthropicModels(provider *services.AIProvider) ([]string, error) {
+func GetAnthropicModels(provider *providers.AIProvider) ([]string, error) {
 
 	apiKey, err := services.GetAPIKey(provider)
 	if err != nil {
@@ -103,7 +104,7 @@ func GetAnthropicModels(provider *services.AIProvider) ([]string, error) {
 }
 
 func init() {
-	anthropicProvider := services.NewAIProvider(
+	anthropicProvider := providers.NewAIProvider(
 		"ANTHROPIC_API_KEY",
 		"sk-",
 		"https://api.anthropic.com/v1",
@@ -121,5 +122,5 @@ func init() {
 		return GetAnthropicModels(anthropicProvider)
 	}
 
-	services.RegisterAIProvider(*anthropicProvider)
+	providers.RegisterAIProvider(*anthropicProvider)
 }

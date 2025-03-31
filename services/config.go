@@ -4,10 +4,12 @@ package services
 import (
 	"fmt"
 	"os"
+
+	"github.com/burritocatai/llamacat/providers"
 )
 
 // ai configs
-func GetAPIKey(aiProvider *AIProvider) (string, error) {
+func GetAPIKey(aiProvider *providers.AIProvider) (string, error) {
 
 	apiKey := os.Getenv(aiProvider.APIKeyENV)
 

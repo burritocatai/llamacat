@@ -5,8 +5,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/burritocatai/llamacat/providers"
 	"github.com/burritocatai/llamacat/providers/openai"
-	"github.com/burritocatai/llamacat/services"
 	"github.com/tmc/langchaingo/prompts"
 )
 
@@ -56,7 +56,7 @@ var GroqModelList = GroqModels{
 	},
 }
 
-func GetGroqModels(provider *services.AIProvider) ([]string, error) {
+func GetGroqModels(provider *providers.AIProvider) ([]string, error) {
 	modelList := make([]string, 0)
 	for _, model := range GroqModelList.Models {
 		modelList = append(modelList, model.ID)
@@ -68,8 +68,8 @@ func GetGroqModels(provider *services.AIProvider) ([]string, error) {
 	return modelList, nil
 }
 
-func CreateGroqProvider() services.AIProvider {
-	groqAIProvider := services.NewAIProvider(
+func CreateGroqProvider() providers.AIProvider {
+	groqAIProvider := providers.NewAIProvider(
 		"GROQ_API_KEY",
 		"gsk_",
 		"https://api.groq.com/openai/v1",
@@ -92,5 +92,5 @@ func CreateGroqProvider() services.AIProvider {
 
 // Groq is an OpenAI compatible service. Just need to register it
 func init() {
-	services.RegisterAIProvider(CreateGroqProvider())
+	providers.RegisterAIProvider(CreateGroqProvider())
 }

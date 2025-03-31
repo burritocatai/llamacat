@@ -1,5 +1,4 @@
-// services/llm.go
-package services
+package providers
 
 import (
 	"context"
