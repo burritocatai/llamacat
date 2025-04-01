@@ -4,10 +4,13 @@ package services
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/burritocatai/llamacat/providers"
 	"github.com/burritocatai/llamacat/providers/fake"
+	"github.com/burritocatai/llamacat/storage"
+	"github.com/spf13/viper"
 	"github.com/tmc/langchaingo/prompts"
 )
 
@@ -50,7 +53,7 @@ func GetProviderAndModel(model string) (providers.AIProvider, string, error) {
 
 }
 
-func GetPrompt(prompt string) (prompts.PromptTemplate, error) {
+func GetPromptConfig(prompt string) (prompts.PromptTemplate, error) {
 	parts := strings.Split(prompt, ":")
 
 	if len(parts) != 2 {
@@ -62,5 +65,43 @@ func GetPrompt(prompt string) (prompts.PromptTemplate, error) {
 	return prompts.NewPromptTemplate(
 			"You are a helpful assistant. Help the user with their content.\n\nCONTENT: {{.content}}", []string{"content"}),
 		nil
+
+}
+
+func GetOutputConfig(output string) (outputFunc func(content string, path string, target string), path string, target string, err error) {
+	parts := strings.Split(output, ":")
+
+	if len(parts) != 2 {
+		return nil, "", "", fmt.Errorf("invalid output parameter, received %s", output)
+	}
+
+	alias := parts[0]
+	target = parts[1]
+
+	if !viper.InConfig("outputs") {
+		return nil, "", "", fmt.Errorf("no outputs configured")
+	}
+	configuredOutputs := viper.Get("outputs").([]interface{})
+
+	for _, config := range configuredOutputs {
+		cfg := config.(map[string]interface{})
+		if cfg["alias"] != alias {
+			continue
+		}
+		switch cfg["destination"] {
+		case "obsidian":
+			return func(content, path, target string) {
+				storage.WriteToObsidian(content, path, target)
+			}, cfg["path"].(string), filepath.Join(target, cfg["file_name"].(string)), nil
+		case "local":
+			return func(content, path, target string) {
+				storage.WriteToLocalStorage(content, path, target)
+			}, cfg["path"].(string), filepath.Join(target, cfg["file_name"].(string)), nil
+		default:
+			return nil, "", "", nil
+		}
+	}
+
+	return nil, "", "", fmt.Errorf("could not find output with alias %s", alias)
 
 }
