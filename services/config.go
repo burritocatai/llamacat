@@ -54,6 +54,16 @@ func GetProviderAndModel(model string) (providers.AIProvider, string, error) {
 }
 
 func GetPromptConfig(prompt string) (prompts.PromptTemplate, error) {
+
+	// if !viper.InConfig("prompts") {
+	// 	return prompts.NewPromptTemplate("error prompt, {{.content}}", []string{"content"}),
+	// 		fmt.Errorf("invalid input prompt source and prompt, received %s", prompt)
+	// }
+
+	if prompt == "" {
+		// set default prompt
+	}
+
 	parts := strings.Split(prompt, ":")
 
 	if len(parts) != 2 {

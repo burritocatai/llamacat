@@ -45,7 +45,7 @@ func TestGetProviderAndModel(t *testing.T) {
 	}
 }
 
-func TestGetPrompt(t *testing.T) {
+func TestGetPromptConfig(t *testing.T) {
 	inputPrompt := "fake:prompt"
 	expectedPrompt := prompts.NewPromptTemplate("You are a helpful assistant. Help the user with their content.\n\nCONTENT: {{.content}}", []string{"content"})
 
