@@ -1,6 +1,9 @@
 package prompts
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestDownloadDefaultPrompts(t *testing.T) {
 
@@ -30,4 +33,13 @@ func TestDownloadPromptRepo(t *testing.T) {
 
 func TestUpdatePromptRepo(t *testing.T) {
 
+}
+
+func TestGetAvailablePrompts(t *testing.T) {
+	prompts, err := GetAvailablePrompts("default")
+	fmt.Printf("avaialbe prompts are: %v", prompts)
+
+	if err != nil {
+		t.Errorf("did not expect error. received %v", err)
+	}
 }
