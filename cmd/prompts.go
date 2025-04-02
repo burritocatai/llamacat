@@ -27,16 +27,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var promptAlias string
+var promptRepo string
+
 // promptsCmd represents the prompts command
 var promptsCmd = &cobra.Command{
 	Use:   "prompts",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "clone or update prompts for llamacat to use",
+	Long: `Clone git repos containing prompts for use within llamacat:
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+Prompts just need a repo and an alias. Use clone to download, and update to 
+pull updates for the prompts.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("prompts called")
 	},
@@ -50,6 +51,8 @@ func init() {
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	// promptsCmd.PersistentFlags().String("foo", "", "A help for foo")
+	promptsCmd.PersistentFlags().StringVarP(&promptAlias, "alias", "a", "", "alias for the prompts")
+	promptsCmd.PersistentFlags().StringVarP(&promptRepo, "repo", "r", "", "git repo for the prompts")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
