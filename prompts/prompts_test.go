@@ -7,24 +7,31 @@ import (
 
 func TestDownloadDefaultPrompts(t *testing.T) {
 
-	err := DownloadDefaultPrompts()
+	status, err := DownloadDefaultPrompts()
 
 	if err != nil {
 		t.Errorf("received err did not expect %v", err)
 	}
-	t.Errorf("test not implemented")
+	if status == Cloned || status == AlreadyExists {
+		// No error
+	} else {
+		t.Errorf("received bad status %v when %v or %v expected", status, Cloned, AlreadyExists)
+	}
 
 }
 
 func TestUpdateDefaultPrompts(t *testing.T) {
 
-	err := UpdateDefaultPrompts()
+	status, err := UpdateDefaultPrompts()
 
 	if err != nil {
 		t.Errorf("received err did not expect %v", err)
 	}
-	t.Errorf("test not implemented")
-
+	if status == UpToDate || status == Updated {
+		// No error
+	} else {
+		t.Errorf("received bad status %v when %v or %v expected", status, UpToDate, Updated)
+	}
 }
 
 func TestDownloadPromptRepo(t *testing.T) {

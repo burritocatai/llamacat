@@ -9,24 +9,52 @@ import (
 	"github.com/go-git/go-git/v5"
 )
 
+type PromptStatus int
+
+const (
+	UpToDate = iota
+	AlreadyExists
+	Cloned
+	Updated
+	Error
+)
+
 const defaultPromptsRepo = "https://github.com/burritocatai/llamacat_prompts"
 
-func DownloadDefaultPrompts() error {
+func DownloadDefaultPrompts() (PromptStatus, error) {
 	return DownloadPromptRepo(defaultPromptsRepo, "default")
 }
 
-func UpdateDefaultPrompts() error {
+func UpdateDefaultPrompts() (PromptStatus, error) {
 	return UpdatePromptRepo("default")
 }
 
-func DownloadPromptRepo(repoUrl, repoAlias string) error {
+func DownloadPromptRepo(repoUrl, repoAlias string) (PromptStatus, error) {
 	err := clonePromptsRepoToDir(repoUrl, repoAlias)
-	return err
+	if err != nil {
+		if strings.Contains(err.Error(), "already exists") {
+			var status PromptStatus = AlreadyExists
+			return status, nil
+		}
+		var status PromptStatus = Error
+		return status, err
+	}
+	var status PromptStatus = Cloned
+	return status, err
 }
 
-func UpdatePromptRepo(repoAlias string) error {
+func UpdatePromptRepo(repoAlias string) (PromptStatus, error) {
 	err := pullExistingPromptsRepo(repoAlias)
-	return err
+	if err != nil {
+		if strings.Contains(err.Error(), "up-to-date") {
+			var status PromptStatus = UpToDate
+			return status, nil
+		}
+		var status PromptStatus = Error
+		return status, err
+	}
+	var status PromptStatus = Updated
+	return status, err
 }
 
 func GetAvailablePrompts(repoAlias string) ([]string, error) {
