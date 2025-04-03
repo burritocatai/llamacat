@@ -23,22 +23,36 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
+	"github.com/burritocatai/llamacat/prompts"
 	"github.com/spf13/cobra"
 )
 
 // cloneCmd represents the clone command
 var cloneCmd = &cobra.Command{
 	Use:   "clone",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "clone a prompt repo for use",
+	Long: `Clones a prompt repo with the selected alias and link into the prompts folder:
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+Repos are kept in ~/.config/llamacat/prompts and are updated with the update command`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("clone called")
+		if promptAlias != "" && promptRepo != "" {
+			promptStatus, err := prompts.DownloadPromptRepo(promptRepo, promptAlias)
+			if err != nil {
+				fmt.Printf("received error trying to download %s from %s. error: %v", promptAlias, promptRepo, err)
+				os.Exit(1)
+			}
+			if promptStatus != prompts.Cloned {
+				fmt.Printf("could not clone prompt repo")
+				os.Exit(1)
+			}
+			fmt.Printf("cloned repo %s from %s. now available as %s:prompt_name", promptAlias, promptRepo, promptAlias)
+			os.Exit(0)
+		} else if promptAlias == "default" {
+			fmt.Printf("cloned %s prompts. now available as %s:prompt_name", promptAlias, promptAlias)
+			prompts.DownloadDefaultPrompts()
+		}
 	},
 }
 
