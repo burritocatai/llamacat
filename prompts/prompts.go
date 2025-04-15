@@ -91,6 +91,40 @@ func GetAvailablePrompts(repoAlias string) ([]string, error) {
 	return foldersWithSystemMD, nil
 }
 
+func GetPromptContent(repoAlias, promptName string) (string, error) {
+	if !promptsExist(repoAlias) {
+		return "", fmt.Errorf("prompts with alias of %s do not exist", repoAlias)
+	}
+
+	// Get a list of directories in the specified path
+	promptsDir, err := getOrCreatePromptsConfigDir()
+	if err != nil {
+		return "", err
+	}
+
+	_, err = os.ReadDir(filepath.Join(promptsDir, repoAlias, promptName))
+	if err != nil {
+		return "", err
+	}
+
+	systemMDPath := filepath.Join(promptsDir, repoAlias, promptName, "SYSTEM.md")
+
+	// Check if the SYSTEM.md file exists (case insensitive)
+	if !fileExists(systemMDPath) {
+		return "", fmt.Errorf("prompt not found")
+	}
+
+	data, err := os.ReadFile(systemMDPath)
+	if err != nil {
+		return "", err
+	}
+
+	// Convert the contents to a string
+	fileContents := string(data)
+
+	return fileContents, nil
+}
+
 // Helper function to check if a file exists (case insensitive)
 func fileExists(filename string) bool {
 	// Check if the file exists

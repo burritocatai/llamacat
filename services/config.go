@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	lc_prompts "github.com/burritocatai/llamacat/prompts"
 	"github.com/burritocatai/llamacat/providers"
 	"github.com/burritocatai/llamacat/providers/fake"
 	"github.com/burritocatai/llamacat/storage"
@@ -72,8 +73,14 @@ func GetPromptConfig(prompt string) (prompts.PromptTemplate, error) {
 	}
 
 	// TODO: implement actual prompt service
+	promptContent, err := lc_prompts.GetPromptContent(parts[0], parts[1])
+	if err != nil {
+		return prompts.NewPromptTemplate("error prompt, {{.content}}", []string{"content"}),
+			err
+	}
+	promptString := fmt.Sprintf("%s\n\nCONTENT: {{.content}}", promptContent)
 	return prompts.NewPromptTemplate(
-			"You are a helpful assistant. Help the user with their content.\n\nCONTENT: {{.content}}", []string{"content"}),
+			promptString, []string{"content"}),
 		nil
 
 }
