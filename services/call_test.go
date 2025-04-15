@@ -4,6 +4,7 @@ package services
 import (
 	"testing"
 
+	lc_prompts "github.com/burritocatai/llamacat/prompts"
 	"github.com/burritocatai/llamacat/providers"
 	"github.com/burritocatai/llamacat/providers/fake"
 	"github.com/tmc/langchaingo/prompts"
@@ -11,9 +12,10 @@ import (
 
 func TestProcessLLMRequest(t *testing.T) {
 	content := "this is what the user has submitted"
-	prompt := "local:fake-prompt"
+	prompt := "default:extract_resume_points"
 	model := "fakeai:fake-model-8b"
 
+	_, _ = lc_prompts.DownloadDefaultPrompts()
 	fakeAI := fake.CreateFakeAIProvider()
 	providers.RegisterAIProvider(fakeAI)
 
