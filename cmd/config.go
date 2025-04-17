@@ -29,6 +29,7 @@ import (
 	"time"
 
 	"github.com/burritocatai/llamacat/providers"
+	"github.com/burritocatai/llamacat/providers/groq"
 	"github.com/burritocatai/llamacat/providers/openai"
 	"github.com/burritocatai/llamacat/services"
 	"github.com/burritocatai/llamacat/storage"
@@ -250,7 +251,9 @@ func showConfig() {
 	}
 
 	openAIProvider := openai.CreateOpenAIProvider()
+	grokAIProvider := groq.CreateGroqProvider()
 	providers.RegisterAIProvider(openAIProvider)
+	providers.RegisterAIProvider(grokAIProvider)
 
 	availableProviders := make([]huh.Option[string], 0)
 	for _, provider := range providers.AIProviders {
