@@ -122,3 +122,12 @@ func GetOutputConfig(output string) (outputFunc func(content string, path string
 	return nil, "", "", fmt.Errorf("could not find output with alias %s", alias)
 
 }
+
+func Contains(slice []string, value string) bool {
+	for _, item := range slice {
+		if item == value {
+			return true
+		}
+	}
+	return false
+}

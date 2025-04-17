@@ -88,6 +88,27 @@ func TestGetOutputFunc(t *testing.T) {
 	}
 }
 
+func TestContains(t *testing.T) {
+	tests := []struct {
+		slice  []string
+		value  string
+		expect bool
+	}{
+		{slice: []string{"apple", "banana", "cherry"}, value: "banana", expect: true},
+		{slice: []string{"apple", "banana", "cherry"}, value: "grape", expect: false},
+		{slice: []string{}, value: "empty", expect: false},
+		{slice: []string{"apple"}, value: "apple", expect: true},
+		{slice: []string{"apple"}, value: "banana", expect: false},
+	}
+
+	for _, test := range tests {
+		result := Contains(test.slice, test.value)
+		if result != test.expect {
+			t.Errorf("Contains(%v, %q) = %v; want %v", test.slice, test.value, result, test.expect)
+		}
+	}
+}
+
 func setupViper(t *testing.T) {
 	viper.SetConfigName("test_config")
 	viper.SetConfigType("yaml")
