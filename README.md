@@ -8,10 +8,14 @@
 
 
 # `llamacat`
-`llamacat` is an application designed to capture the output of LLMs from your input and prompts and seamlessly integrate them into your Second Brain: Obsidian (currently).
+
+`llamacat` is an application designed to capture the output of LLMs from your input and prompts and seamlessly integrate them into your Second Brain: Obsidian, or into STDOUT for piping into other terminal apps or files. Even better, it's extensible, so others can add further targets to `llamacat`. (This is a process that needs figured out.)
 
 Basic Usage:
 
+```shell
+cat interestingfile.txt | llamacat -p default:extract_ideas -m openai:chatgpt-4o-mini -o workvault:Notes
+```
 
 Yup, that's it.
 ## The What and Why
